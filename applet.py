@@ -1,7 +1,7 @@
 from gi.repository import Gtk as gtk
 from gi.repository import AppIndicator3 as appindicator
 from gi.repository import Notify as notify
-from config import sudoPassword, icon_path, base_dir
+from config import sudoPassword, icon_path, base_dir, auto_block
 import os, signal, subprocess
 
 icon_on = "%s/%s" %(icon_path, "switch_on.svg")
@@ -53,6 +53,10 @@ def main():
     indicator.set_menu(build_menu())
     signal.signal(signal.SIGINT, signal.SIG_DFL)
     notify.init(APPINDICATOR_ID)
+
+    if auto_block:
+        keyboard_on(None)
+
     gtk.main()
 
 if __name__ == "__main__":
