@@ -4,50 +4,69 @@ from gi.repository import Notify as notify
 from config import sudoPassword, icon_path, base_dir, auto_block
 import os, signal, subprocess
 
+#icons
 icon_on = "%s/%s" %(icon_path, "switch_on.svg")
 icon_off = "%s/%s" %(icon_path, "switch_off.svg")
 
 APPINDICATOR_ID = 'keyboardindicator'
 indicator = appindicator.Indicator.new(APPINDICATOR_ID, icon_off, appindicator.IndicatorCategory.SYSTEM_SERVICES)
 
+### Menu ###
 def build_menu():
     menu = gtk.Menu()
 
-    item_on = gtk.MenuItem('On')
-    item_on.connect('activate', keyboard_on)
-    menu.append(item_on)
+    ### item ###
+    item_on = gtk.MenuItem('On') # menu label
+    item_on.connect('activate', keyboard_on) #actions
+    menu.append(item_on) #add menu
 
-    item_off = gtk.MenuItem('Off')
-    item_off.connect('activate', keyboard_off)
-    menu.append(item_off)
+    ### item ###
+    item_off = gtk.MenuItem('Off') # menu label
+    item_off.connect('activate', keyboard_off) #actions
+    menu.append(item_off) #add menu
 
-
-    item_quit = gtk.MenuItem('Quit')
-    item_quit.connect('activate', quit)
-    menu.append(item_quit)
+    ### item ###
+    item_quit = gtk.MenuItem('Quit') # menu label
+    item_quit.connect('activate', quit) #actions
+    menu.append(item_quit) #add menu
 
     menu.show_all()
     return menu
 
+### execute binary script ###
 def executeWithRoot(action):
-    os.chdir(base_dir)
+    os.chdir(base_dir) # cd path
+
+    #binary command with params
     command = "./k380_conf -d /dev/hidraw1 -f %s" % action
+
+    #execute binary with sudo
     os.system('echo %s|sudo -S %s' % (sudoPassword, command))
 
+### exit program ###
 def quit(source):
     notify.uninit()
     gtk.main_quit()
 
+### keyboard actions ###
 def keyboard_on(_):
+    #switch icon
     indicator.set_icon(icon_on)
+    #message
     notify.Notification.new("<b>Keyboard Block On</b>", "Block Fn Keys", None).show()
+    #execute binary
     executeWithRoot('on')
 
 def keyboard_off(_):
+    #switch icon
     indicator.set_icon(icon_off)
-    notify.Notification.new("<b>Block Off</b>", "Block Fn Keys", None).show()
+    #message
+    notify.Notification.new("<b>Keyboard Block Off</b>", "Block Fn Keys", None).show()
+    #execute binary
     executeWithRoot('off')
 
+
+### main ###
 def main():
     indicator.set_status(appindicator.IndicatorStatus.ACTIVE)
     indicator.set_menu(build_menu())
