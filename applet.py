@@ -4,13 +4,13 @@ import signal
 import os
 import subprocess
 from gi.repository import Notify as notify
+from config import sudoPassword, icon_path
 
-icons_path = 'icons/'
-icon_on = os.path.abspath(icons_path + "switch_on.svg")
-icon_off = os.path.abspath(icons_path + "switch_off.svg")
+icon_on = "%s/%s" %(icon_path, "switch_on.svg")
+icon_off = "%s/%s" %(icon_path, "switch_off.svg")
 
 APPINDICATOR_ID = 'myappindicator'
-indicator = appindicator.Indicator.new(APPINDICATOR_ID, os.path.abspath(icon_off), appindicator.IndicatorCategory.SYSTEM_SERVICES)
+indicator = appindicator.Indicator.new(APPINDICATOR_ID, icon_off, appindicator.IndicatorCategory.SYSTEM_SERVICES)
 
 def build_menu():
     menu = gtk.Menu()
@@ -31,6 +31,10 @@ def build_menu():
     menu.show_all()
     return menu
 
+def executeWithRoot(action):
+    command = "./k380_conf -d /dev/hidraw1 -f %s" % action
+    os.system('echo %s|sudo -S %s' % (sudoPassword, command))
+
 def quit(source):
     notify.uninit()
     gtk.main_quit()
@@ -39,13 +43,14 @@ def keyboard_on(_):
     indicator.set_icon(icon_on)
     notify.Notification.new("<b>Keyboard Block On</b>", "Block Fn Keys", None).show()
     os.chdir('/opt/k380-function-keys-conf/')
-    subprocess.call(['sudo', "./k380_conf", "-d", "/dev/hidraw1", "-f", "on"])
+    executeWithRoot('on')
+    #subprocess.call(['sudo', "./k380_conf", "-d", "/dev/hidraw1", "-f", "on"])
 
 def keyboard_off(_):
     indicator.set_icon(icon_off)
     notify.Notification.new("<b>Block Off</b>", "Block Fn Keys", None).show()
     #os.chdir('/opt/k380-function-keys-conf/')
-    subprocess.call(['sudo', "./k380_conf", "-d", "/dev/hidraw1", "-f", "off"])
+    executeWithRoot('off')
 
 def main():
     indicator.set_status(appindicator.IndicatorStatus.ACTIVE)
