@@ -1,7 +1,6 @@
 from os import path
 from inspect import getfile, currentframe
 
-sudoPassword = 'your password'
 base_dir = path.dirname(path.abspath(getfile(currentframe())))
 
 #options - icons or icons2
