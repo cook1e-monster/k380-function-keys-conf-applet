@@ -1,7 +1,9 @@
+#!/usr/bin/python
+
 from gi.repository import Gtk as gtk
 from gi.repository import AppIndicator3 as appindicator
 from gi.repository import Notify as notify
-from config import sudoPassword, icon_path, base_dir, auto_block
+from config import icon_path, base_dir, auto_block
 import os, signal, subprocess
 
 #icons
@@ -41,7 +43,7 @@ def executeWithRoot(action):
     command = "./k380_conf -d /dev/hidraw1 -f %s" % action
 
     #execute binary with sudo
-    os.system('echo %s|sudo -S %s' % (sudoPassword, command))
+    os.system(command)
 
 ### exit program ###
 def quit(source):
