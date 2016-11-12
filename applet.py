@@ -8,7 +8,7 @@ from gi.repository import Gtk as gtk
 from gi.repository import AppIndicator3 as appindicator
 from gi.repository import Notify as notify
 from config import icon_path, base_dir, auto_block
-import os, signal, subprocess
+import os, signal, subprocess, sys
 
 #icons
 icon_on = "%s/%s" %(icon_path, "switch_on.svg")
@@ -40,10 +40,71 @@ def build_menu():
     return menu
 
 ### execute binary script ###
-def executeWithRoot(action):
+def execute_command(action):
+
+    file_name = base_dir + '/hidraw'
+    mode = 'r' if os.path.exists(file_name) else 'w'
+
+    try:
+        with open(file_name, mode) as f:
+            hidraw = f.read()
+            print "read file " + file_name
+
+        if not hidraw:
+            print "no data in file " + file_name
+            hidraw = 0
+
+        with open(file_name, 'w') as dest:
+            dest.write('0')
+
+    except IOError as e:
+        print "I/O error({0}): {1}".format(e.errno, e.strerror)
+        hidraw = 0
+
+        with open(file_name, 'w') as dest:
+            dest.write('0')
+
+    except: #handle other exceptions such as attribute errors
+        print "Unexpected error:", sys.exc_info()[0]
+
+
+
+
+
+
+
+
+
+
+
+
+    #try:
+    #    f = open(, 'r')
+    #    hidraw = f.read()[0]
+    #    f.close()
+    #except ValueError as e:
+    #    print e
+    #    f = open(base_dir + '/hidraw', 'w+')
+    #    f.write('0')
+    #    f.close()
+
+
+
     os.chdir(base_dir) # cd path
-    command = "./k380_conf -d /dev/hidraw0 -f %s" % action
-    os.system(command)
+    command = "./k380_conf -d /dev/hidraw%s -f %s" % (hidraw, action)
+
+    c = os.system(command)
+
+    print 'salida command %s' % c
+    if c is not 0:
+        hidraw = 0 if hidraw == '1' else 1
+
+        print "hidraw is %s" % hidraw
+        f = open(base_dir + '/hidraw', 'w+')
+        f.write(str(hidraw))
+        f.close()
+
+        command = "./k380_conf -d /dev/hidraw%s -f %s" % (hidraw, action)
 
 ### exit program ###
 def quit(source):
@@ -57,7 +118,7 @@ def keyboard_on(_):
     #message
     notify.Notification.new("<b>Keyboard Block On</b>", "Block Fn Keys", None).show()
     #execute binary
-    executeWithRoot('on')
+    execute_command('on')
 
 def keyboard_off(_):
     #switch icon
@@ -65,7 +126,7 @@ def keyboard_off(_):
     #message
     notify.Notification.new("<b>Keyboard Block Off</b>", "Block Fn Keys", None).show()
     #execute binary
-    executeWithRoot('off')
+    execute_command('off')
 
 
 ### main ###
@@ -76,7 +137,7 @@ def main():
     notify.init(APPINDICATOR_ID)
 
     if auto_block:
-        keyboard_on(None)
+        keyboard_on("")
 
     gtk.main()
 
