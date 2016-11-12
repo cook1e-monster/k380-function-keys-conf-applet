@@ -1,4 +1,8 @@
 #!/usr/bin/python
+import gi
+gi.require_version('Gtk', '3.0')
+gi.require_version('AppIndicator3', '0.1')
+gi.require_version('Notify', '0.7')
 
 from gi.repository import Gtk as gtk
 from gi.repository import AppIndicator3 as appindicator
@@ -38,11 +42,7 @@ def build_menu():
 ### execute binary script ###
 def executeWithRoot(action):
     os.chdir(base_dir) # cd path
-
-    #binary command with params
-    command = "./k380_conf -d /dev/hidraw1 -f %s" % action
-
-    #execute binary with sudo
+    command = "./k380_conf -d /dev/hidraw0 -f %s" % action
     os.system(command)
 
 ### exit program ###
