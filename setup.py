@@ -22,17 +22,36 @@ def create_file():
         hidraw = value_input
 
     print "create rule udev %s" % file_name
-    file = open(path + file_name, 'w+')
-    text = 'KERNEL=="hidraw%s", SUBSYSTEM=="hidraw", ATTRS{address}=="*", MODE="0666"' % hidraw
+
+    if hidraw is "*"
+        file = open(path + file_name, 'w+')
+        text = 'KERNEL=="hidraw%s", SUBSYSTEM=="hidraw", ATTRS{address}=="*", MODE="0666"' % 0
+        text += 'KERNEL=="hidraw%s", SUBSYSTEM=="hidraw", ATTRS{address}=="*", MODE="0666"' % 1
+    else
+        file = open(path + file_name, 'w+')
+        text = 'KERNEL=="hidraw%s", SUBSYSTEM=="hidraw", ATTRS{address}=="*", MODE="0666"' % hidraw
+
     file.write(text)
     file.write('\n')
     file.close()
 
-    dir_dev = "/dev/hidraw%s" % hidraw
-    print "change permision in %s to 0666" % dir_dev
+    if hidraw is "*"
+        dir_dev = "/dev/hidraw%s" % 0
+        dir_dev2 = "/dev/hidraw%s" % 1
+        print "change permision in %s to 0666" % dir_dev
+        print "change permision in %s to 0666" % dir_dev2
 
-    command = "chmod 0666 %s" % dir_dev
-    system(command)
+        command = "chmod 0666 %s" % dir_dev
+        system(command)
+
+        command = "chmod 0666 %s" % dir_dev2
+        system(command)
+    else
+        dir_dev = "/dev/hidraw%s" % hidraw
+        print "change permision in %s to 0666" % dir_dev
+
+        command = "chmod 0666 %s" % dir_dev
+        system(command)
 
     return
 
@@ -58,7 +77,7 @@ def copy_files():
         else:
             raise
 
-    print "add python %sapplet.py in startup applications" % path
+    print "add python %s applet.py in startup applications" % path
 
     return
 
