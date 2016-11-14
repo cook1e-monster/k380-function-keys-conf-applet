@@ -23,19 +23,25 @@ def create_file():
 
     print "create rule udev %s" % file_name
 
-    if hidraw is "*"
-        file = open(path + file_name, 'w+')
-        text = 'KERNEL=="hidraw%s", SUBSYSTEM=="hidraw", ATTRS{address}=="*", MODE="0666"' % 0
-        text += 'KERNEL=="hidraw%s", SUBSYSTEM=="hidraw", ATTRS{address}=="*", MODE="0666"' % 1
-    else
-        file = open(path + file_name, 'w+')
-        text = 'KERNEL=="hidraw%s", SUBSYSTEM=="hidraw", ATTRS{address}=="*", MODE="0666"' % hidraw
+    file = open(path + file_name, 'w+')
 
-    file.write(text)
-    file.write('\n')
+    if hidraw is "*":
+        text = 'KERNEL=="hidraw%s", SUBSYSTEM=="hidraw", ATTRS{address}=="*", MODE="0666"' % 0
+        file.write(text)
+        file.write('\n')
+
+        text += 'KERNEL=="hidraw%s", SUBSYSTEM=="hidraw", ATTRS{address}=="*", MODE="0666"' % 1
+        file.write(text)
+        file.write('\n')
+
+    else:
+        text = 'KERNEL=="hidraw%s", SUBSYSTEM=="hidraw", ATTRS{address}=="*", MODE="0666"' % hidraw
+        file.write(text)
+        file.write('\n')
+
     file.close()
 
-    if hidraw is "*"
+    if hidraw is "*":
         dir_dev = "/dev/hidraw%s" % 0
         dir_dev2 = "/dev/hidraw%s" % 1
         print "change permision in %s to 0666" % dir_dev
@@ -46,7 +52,7 @@ def create_file():
 
         command = "chmod 0666 %s" % dir_dev2
         system(command)
-    else
+    else:
         dir_dev = "/dev/hidraw%s" % hidraw
         print "change permision in %s to 0666" % dir_dev
 
